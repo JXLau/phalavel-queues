@@ -1,0 +1,80 @@
+<?php
+namespace Phalavel\Queues;
+
+/**
+* 
+*/
+class QueueManager
+{
+    /**
+     * Name of 'database' driver
+     */
+    const DATABASE_QUEUE = 'database';
+
+    /**
+     * Name of 'synchronus' driver
+     */
+    const SYNC_QUEUE = 'sync';
+
+    /**
+     * Name of 'redis' driver
+     */
+    const REDIS_QUEUE = 'redis';
+
+    /**
+     * Name of 'fake' driver
+     */
+    const NULL_QUEUE = null;
+
+    /**
+     * Queue config
+     * @var Phalcon\Config
+     */
+    protected $config;
+
+    /**
+     * Create a new queue manager instance.
+     * @param  \Phalcon\Config $config
+     * @return void
+     */
+    public function __construct($config)
+    {
+        if ( isset($config->queue) && isset($config->queue->driver) ) {
+            $this->config = $config->queue;
+
+            if ( $this->config->driver === static::DATABASE_QUEUE && 
+                !isset( $this->config->database->jobs_table ) ) {
+                throw new \Phalcon\Config\Exception("Jobs database table does not set.", 1);
+            }
+        }
+        else {
+            $this->config = new \Phalcon\Config( [ 'driver' => static::NULL_QUEUE ] );
+        }
+
+
+    }
+
+    /**
+     * Choose queue based on the config
+     * @return Phalavel\Queues\Queue         
+     */
+    public function getQueue()
+    {
+        switch ($this->config->driver) {
+            case static::DATABASE_QUEUE:
+                $queue = new DatabaseQueue();
+                $queue->setTable( $this->config->database->jobs_table );
+                return $queue;
+                break;
+            case static::SYNC_QUEUE:
+                return new SyncQueue();
+                break;
+            case static::REDIS_QUEUE:
+                return new RedisQueue();
+                break;
+            default:
+                return new NullQueue();
+                break;
+        }
+    }
+}

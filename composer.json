@@ -1,0 +1,18 @@
+{
+    "name": "Phalavel/Queues",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jason lau",
+            "email": "liuzhixing@applepi.cn"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "jeremeamia/superclosure": "^2.0",
+        "predis/predis": "^1.1"
+    },
+    "autoload": {
+    	"psr-4": { "Phalavel\\Queues\\": "src/" }
+    }
+}
