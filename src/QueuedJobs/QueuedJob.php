@@ -3,7 +3,6 @@ namespace Phalavel\Queues\QueuedJobs;
 
 use Phalcon\Di\InjectionAwareInterface;
 use Phalcon\DiInterface;
-use SuperClosure\SerializableClosure;
 use Phalavel\Queues\Job;
 
 /**
@@ -43,11 +42,7 @@ abstract class QueuedJob extends Job implements InjectionAwareInterface
     public function resolveAndFire($payload)
     {
         $resolved = unserialize($payload);
-        if ($resolved instanceof SerializableClosure) {
-            $closure = $resolved->getClosure();
-            $closure($this->getDi());
-        }
-        elseif ($resolved instanceof Job) {
+        if ($resolved instanceof Job) {
             $resolved->setDi($this->getDi());
             $resolved->handle();
         }
