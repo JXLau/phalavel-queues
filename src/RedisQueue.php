@@ -1,6 +1,5 @@
 <?php
 namespace Phalavel\Queues;
-use Closure;
 use Phalavel\Queues\LuaScripts;
 use Phalavel\Queues\QueuedJobs\RedisJob;
 use Illuminate\Support\Str;
@@ -43,7 +42,7 @@ class RedisQueue extends Queue
     }
 
     /**
-     * @param  \Closure|Phalavel\Queues\Job  
+     * @param  Phalavel\Queues\Job  
      * @param  string  $queue 
      * @param  integer $delay
      * @return void

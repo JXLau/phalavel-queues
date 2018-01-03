@@ -1,6 +1,5 @@
 <?php
 namespace Phalavel\Queues;
-use Closure;
 
 /**
 * Simple stub for queue, every job pushed
@@ -18,7 +17,7 @@ class SyncQueue extends Queue
     }
 
     /**
-     * @param  \Closure|Phalavel\Queues\Job  
+     * @param  Phalavel\Queues\Job  
      * @param  string  $queue 
      * @param  integer $delay
      * @return void
@@ -28,9 +27,6 @@ class SyncQueue extends Queue
         if ($job instanceof Job) {
             $job->setDi( $this->getDi() );
             $job->handle();
-        }
-        if ($job instanceof Closure) {
-            $job( $this->getDi() );
         }
     }
 

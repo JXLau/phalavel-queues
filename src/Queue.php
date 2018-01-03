@@ -1,10 +1,8 @@
 <?php
 namespace Phalavel\Queues;
 use Carbon\Carbon;
-use Closure;
 use Phalcon\DiInterface;
 use Phalcon\Di\InjectionAwareInterface;
-use SuperClosure\Serializer;
 
 /**
 * Base Queue class with common methods for all types of queues
@@ -43,7 +41,7 @@ abstract class Queue implements InjectionAwareInterface
 
     /**
      * Push job to the queue
-     * @param  \Closure|Phalavel\Queues\Job $job
+     * @param  Phalavel\Queues\Job $job
      */
     abstract public function push($job);
 
@@ -65,17 +63,13 @@ abstract class Queue implements InjectionAwareInterface
 
     /**
      * Create payload from for storing somewhere
-     * @param  \Closure|Phalavel\Queues\Job $job
+     * @param  Phalavel\Queues\Job $job
      * @return string
      */
     protected function createPayload($job)
     {
         if ($job instanceof Job) {
             return serialize($job);
-        }
-        elseif ($job instanceof Closure) {
-            $serializer = new Serializer();
-            return $serializer->serialize($job);
         }
         return null;
     }
