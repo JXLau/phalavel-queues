@@ -3,6 +3,6 @@
 Install via Composer.
 ```json
 "require": {
-    "Phalavel/Queues": "^1.0.1"
+    "Phalavel/Queues": "dev-master"
 }
 ```
