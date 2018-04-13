@@ -10,7 +10,7 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "nesbot/carbon": "dev-master",
+        "nesbot/carbon": "~1.21",
         "predis/predis": "^1.1"
     },
     "autoload": {
