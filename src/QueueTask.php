@@ -82,10 +82,27 @@ class QueueTask extends Task implements InjectionAwareInterface
 
             if (empty($jobs)) {
                 sleep($config['sleep']);
+                //mysql gone away bug
+                $this->dbping();
             } else {
                 foreach ($jobs as $job) {
                     $this->fireJob($job, $config);
                 }
+            }
+        }
+    }
+
+    private function dbping() 
+    {
+        try {
+            $this->db->fetchOne('SELECT 1');
+        } catch (\PDOException $e) {
+            Log::debug( $e->getMessage() );
+            if (strpos($e->getMessage(), 'gone away') !== false) {
+                $this->db->connect();
+            }
+            else {
+                throw $e;
             }
         }
     }
