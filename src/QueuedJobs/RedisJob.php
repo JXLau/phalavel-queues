@@ -72,8 +72,12 @@ class RedisJob extends QueuedJob implements QueuedJobInterface
      */
     public function tryAgain($timeout)
     {
-        $this->reserved->setAttemps($this->attemps()+1);
-        $this->redis->deleteAndRelease($this->queue, $this->reserved, $timeout);
+        $reserved = unserialize($this->reserved);
+        $reserved->setAttemps($this->attemps()+1);
+
+        $job = serialize($reserved);
+
+        $this->redis->deleteAndRelease($this->queue, $this->reserved, $job, $timeout);
     }
 
     /**
@@ -82,7 +86,8 @@ class RedisJob extends QueuedJob implements QueuedJobInterface
      */
     public function attemps()
     {
-        return (int) $this->job->attemps;
+        $job = unserialize($this->job);
+        return (int) $job->attemps;
     }
 
     /**

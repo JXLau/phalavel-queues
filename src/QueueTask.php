@@ -97,7 +97,6 @@ class QueueTask extends Task implements InjectionAwareInterface
         try {
             $this->db->fetchOne('SELECT 1');
         } catch (\PDOException $e) {
-            Log::debug( $e->getMessage() );
             if (strpos($e->getMessage(), 'gone away') !== false) {
                 $this->db->connect();
             }
@@ -205,6 +204,7 @@ class QueueTask extends Task implements InjectionAwareInterface
                 $nextIsValue = true;
             }
         }
+
         return $parsed;
     }
 
@@ -230,7 +230,7 @@ class QueueTask extends Task implements InjectionAwareInterface
             $this->beforeFire($job);
             $job->fire();
             $job->markAsDone();
-        } catch(Exception $e) {
+        } catch(\Exception $e) {
             if ($job->attemps() + 1 >= $config['max_tries'] ) {
                 $this->afterFail($job);
                 $job->markAsFailed();

@@ -130,11 +130,11 @@ class RedisQueue extends Queue
      * @param  int  $delay
      * @return void
      */
-    public function deleteAndRelease($queue, $job, $delay)
+    public function deleteAndRelease($queue, $reserved, $job, $delay)
     {
         $this->getRedis()->eval(
-            LuaScripts::release(), 2, $queue.':delayed', $queue.':reserved',
-            $job, $this->getTime() + $delay
+            LuaScripts::release(), 2, $queue.':delayed', $queue.':reserved', 
+            $reserved, $job, $this->getTime() + $delay
         );
     }
 

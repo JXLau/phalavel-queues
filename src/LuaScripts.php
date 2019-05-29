@@ -35,7 +35,7 @@ LUA;
     {
         return <<<'LUA'
 redis.call('zrem', KEYS[2], ARGV[1])
-redis.call('zadd', KEYS[1], ARGV[2], ARGV[1])
+redis.call('zadd', KEYS[1], ARGV[3], ARGV[2])
 return true
 LUA;
     }
