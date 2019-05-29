@@ -105,7 +105,7 @@ class RedisJob extends QueuedJob implements QueuedJobInterface
      */
     public function markAsFailed()
     {
-        $this->redis->deleteReserved($this->queue, $this->reserved);
+        $this->redis->failedAndRelease($this->queue, $this->reserved, $this->job);
     }
 
     /**

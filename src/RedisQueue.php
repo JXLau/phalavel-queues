@@ -139,6 +139,21 @@ class RedisQueue extends Queue
     }
 
     /**
+     * Delete a reserved job from the reserved queue and release it.
+     *
+     * @param  string  $queue
+     * @param  string  $job
+     * @param  int  $delay
+     * @return void
+     */
+    public function failedAndRelease($queue, $reserved, $job)
+    {
+        $this->getRedis()->eval(
+            LuaScripts::release(), 2, $queue.':failed', $queue.':reserved', $reserved, $job, $this->getTime()
+        );
+    }
+
+    /**
      * Pop the next job off of the queue.
      *
      * @param  string  $queue
