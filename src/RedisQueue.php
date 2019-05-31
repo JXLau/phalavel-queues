@@ -80,20 +80,12 @@ class RedisQueue extends Queue
      * Since we process all jobs synchronusly,
      * no needs to retreive jobs from somewhere
      */
-    public function pull($params)
+    public function pull($queue)
     {
-        foreach (explode(',', $params['queues']) as $queue) {
-            $queues[] = $this->getQueue($queue);
-        }
+        $queue = $this->getQueue($queue);
+        $job = $this->pop($queue);
 
-        $jobs = [];
-        foreach ($queues as $queue) {
-            if (! is_null($job = $this->pop($queue))) {
-                $jobs[] = $job;
-            }
-        }
-
-        return $jobs;
+        return $job;
     }
 
     /**

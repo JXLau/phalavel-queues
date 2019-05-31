@@ -72,24 +72,28 @@ class QueueTask extends Task implements InjectionAwareInterface
         }
         $this->checkQueueType();
 
-        $params = [
-            'queues'    => implode( ',', explode(',', $config['queues']) ),
-            'max_tries' => $config['max_tries'],
-        ];
+        $fork = new \duncan3dc\Forker\Fork;
 
-        while (true) {
-            $jobs = $this->queue->pull($params);
+        foreach (explode(',', $config['queues']) as $queue) {
 
-            if (empty($jobs)) {
-                sleep($config['sleep']);
-                //mysql gone away bug
-                $this->dbping();
-            } else {
-                foreach ($jobs as $job) {
-                    $this->fireJob($job, $config);
+            $that = clone $this;
+
+            $fork->call(function () use ($that, $queue, $config) {
+                while (true) {
+                    $job = $that->queue->pull($queue);
+                    if (is_null($job)) {
+                        sleep($config['sleep']);
+                        $that->dbping();
+                    } else {
+                        $that->fireJob($job, $config);
+                    }
                 }
-            }
+                exit(0);
+            });
+            
         }
+
+        $fork->wait();
     }
 
     private function dbping() 
@@ -260,14 +264,6 @@ class QueueTask extends Task implements InjectionAwareInterface
         printf("    EXAMPLES:".PHP_EOL);
         printf("        queue work --queues default,mail,image-resize &".PHP_EOL);
         printf("        queue work  --sleep 20 --max-tries 3 --try-again-timeout 60 &".PHP_EOL.PHP_EOL);
-        printf("    dbtable - manage queue db table".PHP_EOL);
-        printf("    OPTIONS:".PHP_EOL);
-        printf("        --create - create queue table".PHP_EOL);
-        printf("        --drop - drop queue table".PHP_EOL);
-        printf("        --table - table name".PHP_EOL);
-        printf("    EXAMPLES:".PHP_EOL);
-        printf("        queue dbtable --create".PHP_EOL);
-        printf("        queue dbtable  --drop --table TABLE_NAME".PHP_EOL.PHP_EOL);
         exit;
     }
 
