@@ -13,7 +13,7 @@
         "nesbot/carbon": "~1.21",
         "predis/predis": "^1.1",
         "illuminate/events": "^5.2",
-        "duncan3dc/fork-helper": "2.3.0"
+        "duncan3dc/fork-helper": "2.2.1"
     },
     "autoload": {
     	"psr-4": { "Phalavel\\Queues\\": "src/" }
