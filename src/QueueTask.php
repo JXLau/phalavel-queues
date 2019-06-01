@@ -235,6 +235,8 @@ class QueueTask extends Task implements InjectionAwareInterface
             $job->fire();
             $job->markAsDone();
         } catch(\Exception $e) {
+            $this->log->error('queue job error message=' . $e->getMessage()) . ' trace=' . $e->getTraceAsString();
+
             if ($job->attemps() + 1 >= $config['max_tries'] ) {
                 $this->afterFail($job);
                 $job->markAsFailed();
