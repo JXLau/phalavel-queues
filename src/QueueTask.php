@@ -72,28 +72,22 @@ class QueueTask extends Task implements InjectionAwareInterface
         }
         $this->checkQueueType();
 
-        $fork = new \duncan3dc\Forker\Fork;
+        $params = [
+            'queue' => $config['queue'],
+            'max_tries' => $config['max_tries'],
+        ];
 
-        foreach (explode(',', $config['queues']) as $queue) {
-
-            $that = clone $this;
-
-            $fork->call(function () use ($that, $queue, $config) {
-                while (true) {
-                    $job = $that->queue->pull($queue);
-                    if (is_null($job)) {
-                        sleep($config['sleep']);
-                        $that->dbping();
-                    } else {
-                        $that->fireJob($job, $config);
-                    }
-                }
-                exit(0);
-            });
+        while (true) {
+            $job = $this->queue->pull($params['queue']);
+            if (is_null($job)) {
+                sleep($config['sleep']);
+                //mysql gone away bug
+                $this->dbping();
+            } else {
+                $this->fireJob($job, $config);
+            }
             
         }
-
-        $fork->wait();
     }
 
     private function dbping() 
@@ -160,7 +154,7 @@ class QueueTask extends Task implements InjectionAwareInterface
      */
     protected function beforeFire($job)
     {
-
+        $this->dbping();
     }
 
     /**
@@ -237,7 +231,11 @@ class QueueTask extends Task implements InjectionAwareInterface
         } catch(\Exception $e) {
             $this->log->error('queue job error message=' . $e->getMessage()) . ' trace=' . $e->getTraceAsString();
 
-            if ($job->attemps() + 1 >= $config['max_tries'] ) {
+            if (strpos($e->getMessage(), 'gone away') !== false) {
+                $this->db->connect();
+                $job->tryAgain($config['try_again_timeout']);
+                
+            } elseif ($job->attemps() + 1 >= $config['max_tries'] ) {
                 $this->afterFail($job);
                 $job->markAsFailed();
             } else {
