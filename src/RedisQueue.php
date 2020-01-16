@@ -38,6 +38,10 @@ class RedisQueue extends Queue
      */
     protected function getRedis()
     {
+        if ($this->getDI()->has('queue_redis')) {
+            return $this->getDI()->getShared('queue_redis');
+        }
+        
         return $this->getDI()->getShared('redis');
     }
 
